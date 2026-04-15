@@ -88,7 +88,7 @@ void setup()
 
     Particle.connect();
 
-    // Load cached env vars on boot so thresholds are correct before the first check
+    // Load cached env vars on boot so thresholds are correct before the first check, only loaded at boot
     update_env_vars();
 }
 
@@ -99,7 +99,8 @@ void loop()
     // Run the temperature check on the configured period
     if ((lastPublish == 0) || (millis() - lastPublish >= temp_period.count())) {
         lastPublish = millis();
-        update_env_vars();  // refresh thresholds and period from Console before each check
+
+        // get temperature reading, update alert state, and publish if thresholds are exceeded
         check_temp();
     }
 }
@@ -138,7 +139,7 @@ void update_env_vars() {
     if (System.getEnv("TEMP_PERIOD", env_val)) {
         int period_sec = env_val.toInt();
         if (period_sec > 0) {
-            temp_period = std::chrono::milliseconds((long long)period_sec * 1000);
+            temp_period = std::chrono::milliseconds((long long)period_sec * 1000);      // mutiply by 1000 to convert seconds to milliseconds
             Log.info("TEMP_PERIOD: %lld ms", temp_period.count());
         }
     }
