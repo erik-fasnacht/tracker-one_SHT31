@@ -48,13 +48,13 @@ The SHT31 is wired to I2C bus 3 (Wire3) on the M8 connector. The firmware enable
 SHT31 temperature and humidity readings appended to every Tracker location publish as `sh31_temp` and `sh31_humid`
 
 ✅ **Alert events**
-Publishes `high temp event` or `low temp event` to the Particle Cloud when a threshold is crossed; no event published during normal operation
+Publishes `high temp event` to the Particle Cloud when the high threshold is crossed; no event published during normal operation
 
 ✅ **Runtime configuration**
-`TEMP_HIGH`, `TEMP_LOW`, and `TEMP_PERIOD` controlled from the Particle Console without reflashing — changes take effect on the next temperature check cycle
+`TEMP_HIGH`, `TIME_ZONE`, and `TEMP_PERIOD` controlled from the Particle Console without reflashing — changes take effect on the next temperature check cycle
 
 ✅ **Safe defaults**
-Firmware boots with sensible thresholds (30 °C / 15 °C) and loads Console values as soon as they are available; previously cached values are used if the device is offline at boot
+Firmware boots with a sensible threshold (86 °F) and loads Console values as soon as they are available; previously cached values are used if the device is offline at boot
 
 ✅ **Periodic monitoring**
 Temperature checked on a configurable interval (default 60 seconds), independent of the location publish cadence
@@ -69,8 +69,8 @@ Environment variables are lightweight name-value pairs configured in the [Partic
 
 | Variable | Description | Default | Unit |
 |---|---|---|---|
-| `TEMP_HIGH` | High temperature alert threshold | `30.0` | °C |
-| `TEMP_LOW` | Low temperature alert threshold | `15.0` | °C |
+| `TEMP_HIGH` | High temperature alert threshold | `86.0` | °F |
+| `TIME_ZONE` | UTC offset for local time in location publishes | `-7.0` | hours |
 | `TEMP_PERIOD` | Time between temperature checks | `60` | seconds |
 
 ### Setting Variables in the Console
@@ -138,15 +138,17 @@ On every location fix, the Tracker Edge framework publishes a `loc` event. This 
 
 ```json
 {
-  "sh31_temp": 22.45,
-  "sh31_humid": 58.3
+  "sh31_temp": 72.41,
+  "sh31_humid": 58.3,
+  "local_time": "12:27:01 PM"
 }
 ```
 
 | Field | Type | Description |
 |---|---|---|
-| `sh31_temp` | float | Temperature in °C |
+| `sh31_temp` | float | Temperature in °F |
 | `sh31_humid` | float | Relative humidity in % |
+| `local_time` | string | Local time at publish, formatted HH:MM:SS AM/PM |
 
 ### Alert Events
 
@@ -154,8 +156,7 @@ When a temperature reading crosses a threshold, a separate cloud event is publis
 
 | Event Name | Trigger | Payload |
 |---|---|---|
-| `high temp event` | `temp > TEMP_HIGH` | `{"temperature": 32.1}` |
-| `low temp event` | `temp < TEMP_LOW` | `{"temperature": 12.4}` |
+| `high temp event` | `temp > TEMP_HIGH` | `{"temperature": 98.6}` |
 
 No alert event is published while temperature is within the normal range — those readings are captured by the location publish.
 
