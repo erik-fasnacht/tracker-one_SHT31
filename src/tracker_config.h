@@ -93,4 +93,4 @@
 #define TRACKER_USER_BUTTON                   (D1)
 #define TRACKER_GNSS_LOCK_LED                 (D2)
 
-//#define RTC_WDT_DISABLE // Optional define for Tracker
+#define RTC_WDT_DISABLE // Optional define for Tracker

@@ -107,10 +107,10 @@ void loop()
     Tracker::instance().loop();
 
     // Run the temperature check on the configured period
-    // if ((lastPublish == 0) || (millis() - lastPublish >= temp_period.count())) {
-    //     lastPublish = millis();
-    //     check_temp();
-    // }
+    if ((lastPublish == 0) || (millis() - lastPublish >= temp_period.count())) {
+        lastPublish = millis();
+        check_temp();
+    }
 }
 
 // Appends sh31_temp (°F), sh31_humid, and local_time to the location publish JSON payload.
@@ -197,8 +197,17 @@ void check_temp() {
                 event.name("high temp event");
                 event.data(obj);
                 Particle.publish(event);
-                high_temp_count++;
-                Log.info("publishing %s (%d/3)", obj.toJSON().c_str(), high_temp_count);
+                Log.info("publishing %s", obj.toJSON().c_str());
+
+                waitForNot(event.isSending, 60000);
+
+                if (event.isSent()) {
+                    high_temp_count++;
+                    Log.info("publish succeeded (%d/3)", high_temp_count);
+                } else if (!event.isOk()) {
+                    Log.warn("publish failed error=%d", event.error());
+                }
+                event.clear();
             } else {
                 Log.info("high temp alert cap reached (3/3), suppressing publish");
             }
