@@ -51,7 +51,7 @@ SHT31 temperature and humidity readings appended to every Tracker location publi
 Publishes `high temp event` to the Particle Cloud when the high threshold is crossed; no event published during normal operation
 
 ✅ **Runtime configuration**
-`TEMP_HIGH`, `TIME_ZONE`, and `TEMP_PERIOD` controlled from the Particle Console without reflashing — changes take effect on the next temperature check cycle
+`TEMP_HIGH` and `TIME_ZONE` controlled from the Particle Console without reflashing — changes take effect on the next location publish
 
 ✅ **Safe defaults**
 Firmware boots with a sensible threshold (86 °F) and loads Console values as soon as they are available; previously cached values are used if the device is offline at boot
@@ -71,7 +71,6 @@ Environment variables are lightweight name-value pairs configured in the [Partic
 |---|---|---|---|
 | `TEMP_HIGH` | High temperature alert threshold | `86.0` | °F |
 | `TIME_ZONE` | UTC offset for local time in location publishes | `-7.0` | hours |
-| `TEMP_PERIOD` | Time between temperature checks | `60` | seconds |
 
 ### Setting Variables in the Console
 
