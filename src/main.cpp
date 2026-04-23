@@ -22,7 +22,7 @@
 #include "sht3x-i2c.h"
 
 // defines the firmware version
-#define FIRWARE_VERSION 22
+#define FIRWARE_VERSION 23
 
 // SYSTEM_THREAD is on by default in Device OS 6.2.0+
 #ifndef SYSTEM_VERSION_v620
@@ -57,8 +57,8 @@ CloudEvent event;
 // Threshold globals — initialized to safe defaults, overridden by Console env vars:
 //   TEMP_HIGH – high temperature alert threshold (°F)
 //   TIME_ZONE – UTC offset in hours for local time in location publishes
-double        limit_high  = 86.0;           // °F (≈ 30 °C)
-double        time_zone   = -7.0;           // UTC offset, defaults to PDT
+double limit_high  = 86.0;      // °F (≈ 30 °C)
+double time_zone   = -7.0;      // UTC offset, defaults to PDT
 
 // Forward declarations
 void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, const void *context);
@@ -76,10 +76,6 @@ void setup()
     pinMode(CAN_PWR, OUTPUT);
     digitalWrite(CAN_PWR, HIGH);
     delay(500);
-
-    // Start SHT31 in periodic measurement mode at 400 kHz
-    // sensor.begin(CLOCK_SPEED_400KHZ);
-    // sensor.start_periodic();
 
     // Connect to the Particle Cloud
     Particle.connect();
@@ -101,7 +97,7 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
     
     // Include local time in the payload if the RTC is valid
     if (Time.isValid()) {
-        writer.name("local time").value(Time.format(Time.now(), "%I:%M:%S %p"));
+        writer.name("local_time").value(Time.format(Time.now(), "%I:%M:%S %p"));
     }
 
     // Start a new I2C transaction 
@@ -130,7 +126,7 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
             particle::Variant obj;
             obj.set("temperature", temp_f);
 
-            event.name("high temp event");
+            event.name("high_temp_event");
             event.data(obj);
             Particle.publish(event);
             Log.info("publishing %s", obj.toJSON().c_str());
@@ -147,7 +143,7 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
     }
     else {
         Log.info("no sensor err=%d", err);
-        writer.name("No Sensor found").value(err);       
+        writer.name("No_Sensor_found").value(err);       
     } 
 }
 
