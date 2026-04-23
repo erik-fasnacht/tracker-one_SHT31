@@ -22,7 +22,7 @@
 #include "sht3x-i2c.h"
 
 // defines the firmware version
-#define FIRWARE_VERSION 21
+#define FIRWARE_VERSION 22
 
 // SYSTEM_THREAD is on by default in Device OS 6.2.0+
 #ifndef SYSTEM_VERSION_v620
@@ -78,8 +78,8 @@ void setup()
     delay(500);
 
     // Start SHT31 in periodic measurement mode at 400 kHz
-    sensor.begin(CLOCK_SPEED_400KHZ);
-    sensor.start_periodic();
+    // sensor.begin(CLOCK_SPEED_400KHZ);
+    // sensor.start_periodic();
 
     // Connect to the Particle Cloud
     Particle.connect();
@@ -98,16 +98,30 @@ void loop()
 void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, const void *context)
 {
     double temp, humid;
+    
+    // Include local time in the payload if the RTC is valid
+    if (Time.isValid()) {
+        writer.name("local time").value(Time.format(Time.now(), "%I:%M:%S %p"));
+    }
 
+    // Start a new I2C transaction 
+    sensor.begin(CLOCK_SPEED_400KHZ);
+    sensor.start_periodic();
+    delay(500);
+
+    //read from the sensor; if there's an error, include it in the payload and skip threshold checks
     int err = sensor.get_reading(&temp, &humid);
+
+    //end the I2C transaction to free the bus
+    sensor.stop_periodic();
+
+
     if (err == 0)
     {
         double temp_f = (temp * 9.0 / 5.0) + 32.0;
         writer.name("sh31_temp").value(temp_f);
         writer.name("sh31_humid").value(humid);
-        if (Time.isValid()) {
-            writer.name("local_time").value(Time.format(Time.now(), "%I:%M:%S %p"));
-        }
+        
         Log.info("temp=%.2lf°F hum=%.2lf", temp_f, humid);
 
         if (temp_f > limit_high) {
@@ -133,7 +147,8 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
     }
     else {
         Log.info("no sensor err=%d", err);
-    }
+        writer.name("No Sensor found").value(err);       
+    } 
 }
 
 // Reads TEMP_HIGH and TIME_ZONE from Particle Console environment variables.
