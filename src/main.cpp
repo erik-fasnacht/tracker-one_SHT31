@@ -22,7 +22,7 @@
 #include "sht3x-i2c.h"
 
 // defines the firmware version
-#define FIRWARE_VERSION 23
+#define FIRWARE_VERSION 24
 
 // SYSTEM_THREAD is on by default in Device OS 6.2.0+
 #ifndef SYSTEM_VERSION_v620
@@ -101,7 +101,14 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
     }
 
     //I2C software reset sequence for SHT31 sensor; ensures the sensor is in a known state before reading
-    
+     //clock SCL up to 9 times max; exit early if SDA reads high (bus released)
+    for (int i = 0; i < 9; i++) {
+        if (digitalRead(RX) == HIGH) break;
+        digitalWrite(TX, LOW);
+        delayMicroseconds(10);
+        digitalWrite(TX, HIGH);
+        delayMicroseconds(10);
+    }
     
     // Start a new I2C transaction 
     sensor.begin(CLOCK_SPEED_10KHZ);
