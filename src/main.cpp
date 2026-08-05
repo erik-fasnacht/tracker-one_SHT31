@@ -100,8 +100,11 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
         writer.name("local_time").value(Time.format(Time.now(), "%I:%M:%S %p"));
     }
 
+    //I2C software reset sequence for SHT31 sensor; ensures the sensor is in a known state before reading
+    
+    
     // Start a new I2C transaction 
-    sensor.begin(CLOCK_SPEED_400KHZ);
+    sensor.begin(CLOCK_SPEED_10KHZ);
     sensor.start_periodic();
     delay(500);
 
