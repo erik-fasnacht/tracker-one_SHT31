@@ -111,7 +111,7 @@ void myLocationGenerationCallback(JSONWriter &writer, LocationPoint &point, cons
     }
     
     // Start a new I2C transaction 
-    sensor.begin(CLOCK_SPEED_100KHZ);
+    sensor.begin(CLOCK_SPEED_10KHZ);
     sensor.start_periodic();
     delay(500);
 
